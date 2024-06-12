@@ -555,6 +555,69 @@ There is a [proposal](https://github.com/microsoft/TypeScript/issues/23689) to i
 
 ---
 
+## Treating everything as immutable
+
+A sensible approach could be to treat everything as immutable by default, even if it isn't.
+
+This can sometimes lead to ugly messes though.
+
+---
+
+## Let's expand on Pikachu a bit
+
+```typescript
+const pikachu : Pokemon = {
+  name: "Pikachu",
+  level: 20,
+  startingAbility: {
+    name: "Tackle",
+    type: {
+      name: "FIRE",
+      multiplier: 2
+    }
+  }
+}
+```
+
+---
+
+## Oh but the Ability type is wrong, let's fix it without mutating the old object:
+
+```typescript
+const fixedPikachu : Pokemon = {
+  ...pikachu,
+  startingAbility: {
+    ...pikachu.startingAbility,
+    type: {
+      ...pikachu.startingAbility.type,
+      name: "NORMAL"
+    }
+  }
+}
+```
+
+(Looks like most [React](https://react.dev/) code I encounter)
+
+---
+
+## Introducing Immer
+
+So a cool way of doing the same thing without mutating is using [immer](https://immerjs.github.io/immer):
+
+```typescript
+import { produce } from 'immer';
+
+const fixedPikachu : Pokemon = produce(pikachu, (draft) => {
+  draft.startingAbility.type.name = "NORMAL"
+});
+```
+
+Mutate away!
+
+If you're familiar with [Redux](https://redux.js.org/) you most likely encountered this already.
+
+---
+
 ## Traits
 
 I often need to log certain datatypes in every programming language I use while debugging.
@@ -842,6 +905,7 @@ Cool libraries and tools:
 
 - [fp-ts](https://gcanti.github.io/fp-ts/)
 - [ts-pattern](https://github.com/gvergnaud/ts-pattern)
+- [immer](https://immerjs.github.io/immer)
 - [Pretty Typescript Errors](https://marketplace.visualstudio.com/items?itemName=yoavbls.pretty-ts-errors)
 
 ---
@@ -859,5 +923,3 @@ I'd love to hear your thoughts, feel free to:
 - ask questions now
 - connect on LinkedIn
 - approach me later :)
-
----
